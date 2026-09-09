@@ -1,150 +1,176 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ClassRank</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>P.3 Daily Star Ranking</title>
 <style>
-body{
-  font-family:Arial,sans-serif;
-  background:#fff8fd;
-  margin:0;
-  padding:20px;
-  color:#333;
+:root{
+  --ink:#3b3650; --muted:#7d7890; --pink:#ff91c8; --purple:#b79cff; --blue:#93d7ff;
+  --mint:#a7ebc9; --yellow:#ffe07b; --red:#ffaaaa; --card:#fff; --shadow:0 10px 28px rgba(75,53,90,.12);
 }
-h1{text-align:center}
-.top{
-  display:flex;
-  justify-content:center;
-  gap:12px;
-  flex-wrap:wrap;
-  margin-bottom:20px;
-}
-.card{
-  background:white;
-  border-radius:18px;
-  padding:16px;
-  margin:10px auto;
-  max-width:700px;
-  box-shadow:0 6px 20px rgba(0,0,0,.08);
-}
-.student{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-  margin:10px 0;
-  padding:12px;
-  border-radius:14px;
-  background:#fafafa;
-}
-.name{font-weight:bold}
-.score{font-size:22px;font-weight:bold}
-button{
-  border:none;
-  border-radius:10px;
-  padding:10px 14px;
-  font-size:16px;
-  cursor:pointer;
-}
-.plus{background:#dff7e8}
-.minus{background:#ffe1e1}
-.rank{
-  font-size:14px;
-  color:#666;
-}
+*{box-sizing:border-box}
+body{margin:0;font-family:ui-rounded,"SF Pro Rounded","Noto Sans Thai",system-ui,-apple-system,Segoe UI,sans-serif;
+background:linear-gradient(180deg,#fff7fc 0%,#f7fbff 100%);color:var(--ink)}
+header{text-align:center;padding:24px 16px 8px}
+h1{margin:0;font-size:clamp(28px,4vw,46px)}
+.subtitle{margin-top:6px;color:var(--muted)}
+.toolbar{max-width:1180px;margin:14px auto 18px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center;padding:0 16px}
+button,input,select{font:inherit}
+.btn{border:0;border-radius:14px;padding:10px 14px;background:white;box-shadow:var(--shadow);cursor:pointer}
+.btn.primary{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;font-weight:800}
+.btn.soft{background:#effcf5}
+.btn.warn{background:#fff1f1}
+.summary{max-width:1180px;margin:0 auto 16px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:0 16px}
+.box{background:#fff;border-radius:18px;padding:14px;text-align:center;box-shadow:var(--shadow)}
+.box b{display:block;font-size:24px}
+.section{max-width:1180px;margin:0 auto 16px;padding:0 16px}
+.section h2{text-align:center;margin:6px 0 10px}
+.podium,.bottom3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.pod,.duty{background:white;border-radius:20px;padding:14px;text-align:center;box-shadow:var(--shadow)}
+.pod:nth-child(1){background:linear-gradient(180deg,#fff7cc,#fff)}
+.pod:nth-child(2){background:linear-gradient(180deg,#f0f3f8,#fff)}
+.pod:nth-child(3){background:linear-gradient(180deg,#ffe8db,#fff)}
+.duty{background:linear-gradient(180deg,#fff2f2,#fff)}
+.medal,.broom{font-size:30px}
+.name{font-weight:900}.score{color:var(--muted)}
+.grid{max-width:1180px;margin:0 auto 36px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;padding:0 16px}
+.card{position:relative;background:white;border-radius:22px;padding:15px;box-shadow:var(--shadow)}
+.rank{position:absolute;top:12px;right:12px;background:#f3efff;border-radius:999px;padding:6px 10px;font-weight:900}
+.nameRow{display:flex;align-items:center;gap:10px;margin-right:74px}
+.avatar{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-size:25px;background:linear-gradient(135deg,#fff0f7,#eef8ff)}
+.nameInput{width:100%;border:0;border-bottom:2px dashed #ded9e8;padding:6px;font-weight:900;font-size:18px;background:transparent}
+.scoreBig{font-size:38px;font-weight:1000;margin:10px 0 2px}
+.small{font-size:12px;color:var(--muted)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.actions button{border:0;border-radius:13px;padding:10px 13px;font-weight:900;cursor:pointer}
+.plus{background:#e9fbf1}.minus{background:#fff0f0}
+.reason{flex:1;min-width:180px;padding:9px;border-radius:12px;border:1px solid #ece8f3;background:#fff}
+.log{margin-top:9px;background:#faf9fc;border-radius:12px;padding:8px;max-height:70px;overflow:auto;font-size:12px;color:#676273}
+.note{max-width:1180px;margin:-14px auto 28px;text-align:center;color:#7c778a;padding:0 16px;font-size:13px}
+@media(max-width:850px){.grid{grid-template-columns:1fr}.summary{grid-template-columns:1fr}.podium,.bottom3{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
+<header>
+  <h1>🌟 P.3 DAILY STAR RANKING 🌟</h1>
+  <div class="subtitle">ทุกคนเริ่มต้นวันละ 10 ดาว • ทำดีบวกเพิ่ม • พฤติกรรมที่ต้องปรับหักคะแนน</div>
+</header>
 
-<h1>🌟 ClassRank 🌟</h1>
-
-<div class="top">
-  <button onclick="resetDay()">เริ่มวันใหม่ 10 คะแนน</button>
+<div class="toolbar">
+  <input id="datePicker" class="btn" type="date">
+  <button class="btn primary" onclick="save()">💾 บันทึก</button>
+  <button class="btn soft" onclick="resetToday()">🔄 เริ่มวันนี้ใหม่ 10 ดาว</button>
+  <button class="btn warn" onclick="resetNames()">✏️ ล้างชื่อ</button>
 </div>
 
-<div class="card">
-  <h2>🏆 Ranking วันนี้</h2>
-  <div id="ranking"></div>
+<div class="summary">
+  <div class="box"><span>นักเรียน</span><b>14 คน</b></div>
+  <div class="box"><span>คะแนนเริ่มต้น</span><b>10 ⭐</b></div>
+  <div class="box"><span>การจัดอันดับ</span><b>รายวัน</b></div>
 </div>
 
-<div class="card">
-  <h2>นักเรียน 14 คน</h2>
-  <div id="students"></div>
-</div>
+<section class="section">
+  <h2>🏆 เด็กดี TOP 3 วันนี้</h2>
+  <div class="podium" id="podium"></div>
+</section>
+
+<section class="section">
+  <h2>🧹 3 อันดับท้าย — เวรประจำวัน</h2>
+  <div class="bottom3" id="bottom3"></div>
+</section>
+
+<main class="grid" id="grid"></main>
+
+<div class="note">คะแนนของแต่ละวันถูกบันทึกแยกตามวันที่ในเบราว์เซอร์เครื่องนี้ สามารถย้อนดูวันก่อนหน้าได้จากช่องวันที่ด้านบน</div>
 
 <script>
-const defaultNames = [
-  "นักเรียน 1","นักเรียน 2","นักเรียน 3","นักเรียน 4",
-  "นักเรียน 5","นักเรียน 6","นักเรียน 7","นักเรียน 8",
-  "นักเรียน 9","นักเรียน 10","นักเรียน 11","นักเรียน 12",
-  "นักเรียน 13","นักเรียน 14"
-];
+const namesKey="p3_daily_names";
+const dataKey="p3_daily_scores";
+const avatars=["🐰","🐻","🐱","🐼","🦊","🐨","🐯","🐸","🐹","🦁","🐧","🐥","🦄","🐶"];
+const plusReasons=["ตั้งใจเรียน","ส่งงานครบ","ช่วยเหลือเพื่อน","มีน้ำใจ","ทำหน้าที่ดี","ตอบคำถาม/มีส่วนร่วม"];
+const minusReasons=["วิ่งในห้อง","คุยเสียงดัง","ไม่ส่งงาน","ไม่ทำตามข้อตกลง","รบกวนเพื่อน","ไม่รับผิดชอบหน้าที่"];
 
-let data = JSON.parse(localStorage.getItem("classrank")) || 
-defaultNames.map((name,i)=>({
-  id:i+1,
-  name:name,
-  score:10
-}));
+let names=JSON.parse(localStorage.getItem(namesKey)||"null");
+if(!names) names=Array.from({length:14},(_,i)=>`นักเรียน ${i+1}`);
+let allData=JSON.parse(localStorage.getItem(dataKey)||"{}");
 
-function save(){
-  localStorage.setItem("classrank",JSON.stringify(data));
+const dp=document.getElementById("datePicker");
+const today=new Date();
+const pad=n=>String(n).padStart(2,"0");
+dp.value=`${today.getFullYear()}-${pad(today.getMonth()+1)}-${pad(today.getDate())}`;
+
+function freshDay(){return Array.from({length:14},()=>({score:10,logs:[]}));}
+function getDate(){return dp.value}
+function getDay(){
+  const d=getDate();
+  if(!allData[d]) allData[d]=freshDay();
+  return allData[d];
 }
-
-function changeScore(id,amount){
-  const student=data.find(s=>s.id===id);
-  student.score+=amount;
-  save();
-  render();
+function ranking(){
+  const day=getDay();
+  const arr=day.map((s,i)=>({i,score:s.score,name:names[i]})).sort((a,b)=>b.score-a.score || a.i-b.i);
+  const ranks={}; let last=null,rank=0;
+  arr.forEach((x,idx)=>{if(x.score!==last){rank=idx+1;last=x.score}ranks[x.i]=rank;});
+  return {arr,ranks};
 }
-
-function resetDay(){
-  if(confirm("เริ่มวันใหม่และรีเซ็ตทุกคนเป็น 10 คะแนนใช่ไหม?")){
-    data.forEach(s=>s.score=10);
-    save();
-    render();
-  }
-}
-
 function render(){
-  const students=document.getElementById("students");
-  students.innerHTML="";
-
-  data.forEach(s=>{
-    const div=document.createElement("div");
-    div.className="student";
-    div.innerHTML=`
-      <div>
-        <div class="name">${s.name}</div>
-        <div class="rank">คะแนนวันนี้</div>
+  const day=getDay();
+  const {arr,ranks}=ranking();
+  const medals=["🥇","🥈","🥉"];
+  document.getElementById("podium").innerHTML=arr.slice(0,3).map((x,j)=>`
+    <div class="pod"><div class="medal">${medals[j]}</div><div class="name">${esc(x.name)}</div><div class="score">${x.score} ⭐</div></div>`).join("");
+  const bottom=[...arr].sort((a,b)=>a.score-b.score || a.i-b.i).slice(0,3);
+  document.getElementById("bottom3").innerHTML=bottom.map(x=>`
+    <div class="duty"><div class="broom">🧹</div><div class="name">${esc(x.name)}</div><div class="score">${x.score} ⭐ • เวรประจำวัน</div></div>`).join("");
+  document.getElementById("grid").innerHTML=day.map((s,i)=>`
+    <div class="card">
+      <div class="rank">#${ranks[i]}</div>
+      <div class="nameRow"><div class="avatar">${avatars[i]}</div>
+        <input class="nameInput" value="${attr(names[i])}" onchange="rename(${i},this.value)">
       </div>
-      <div class="score">${s.score} ⭐</div>
-      <div>
-        <button class="plus" onclick="changeScore(${s.id},1)">+1</button>
-        <button class="minus" onclick="changeScore(${s.id},-1)">-1</button>
+      <div class="scoreBig">${s.score} ⭐</div>
+      <div class="small">คะแนนวันนี้</div>
+      <div class="actions">
+        <select id="reason-${i}" class="reason">
+          <optgroup label="⭐ เพิ่มคะแนน">${plusReasons.map(r=>`<option value="${attr(r)}">+1 ${esc(r)}</option>`).join("")}</optgroup>
+          <optgroup label="⚡ หักคะแนน">${minusReasons.map(r=>`<option value="${attr(r)}">-1 ${esc(r)}</option>`).join("")}</optgroup>
+        </select>
+        <button class="plus" onclick="change(${i},1)">⭐ +1</button>
+        <button class="minus" onclick="change(${i},-1)">⚡ -1</button>
       </div>
-    `;
-    students.appendChild(div);
-  });
-
-  const sorted=[...data].sort((a,b)=>b.score-a.score);
-  const ranking=document.getElementById("ranking");
-  ranking.innerHTML="";
-
-  sorted.forEach((s,index)=>{
-    const row=document.createElement("div");
-    row.className="student";
-    row.innerHTML=`
-      <div class="name">#${index+1} ${s.name}</div>
-      <div class="score">${s.score} ⭐</div>
-    `;
-    ranking.appendChild(row);
-  });
+      <div class="log">${s.logs.slice(-5).reverse().map(x=>`• ${esc(x)}`).join("<br>")||"ยังไม่มีการเปลี่ยนคะแนนวันนี้"}</div>
+    </div>`).join("");
 }
-
-render();
+function change(i,delta){
+  const day=getDay();
+  const reason=document.getElementById(`reason-${i}`).value;
+  day[i].score+=delta;
+  day[i].logs.push(`${delta>0?"+1":"-1"} ${reason}`);
+  save(); render();
+}
+function rename(i,v){
+  names[i]=v.trim()||`นักเรียน ${i+1}`;
+  save(); render();
+}
+function save(){
+  localStorage.setItem(namesKey,JSON.stringify(names));
+  localStorage.setItem(dataKey,JSON.stringify(allData));
+}
+function resetToday(){
+  if(!confirm("รีเซ็ตคะแนนของวันที่เลือกกลับเป็น 10 ดาวทุกคน และล้างประวัติของวันนี้?")) return;
+  allData[getDate()]=freshDay();
+  save();render();
+}
+function resetNames(){
+  if(!confirm("ล้างชื่อทั้งหมดกลับเป็น นักเรียน 1-14 ?")) return;
+  names=Array.from({length:14},(_,i)=>`นักเรียน ${i+1}`);
+  save();render();
+}
+function esc(t){return String(t).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]))}
+function attr(t){return esc(t)}
+dp.addEventListener("change",()=>{getDay();save();render();});
+getDay();save();render();
 </script>
-
 </body>
 </html>
