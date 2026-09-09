@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ClassRank</title>
+<style>
+body{
+  font-family:Arial,sans-serif;
+  background:#fff8fd;
+  margin:0;
+  padding:20px;
+  color:#333;
+}
+h1{text-align:center}
+.top{
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-bottom:20px;
+}
+.card{
+  background:white;
+  border-radius:18px;
+  padding:16px;
+  margin:10px auto;
+  max-width:700px;
+  box-shadow:0 6px 20px rgba(0,0,0,.08);
+}
+.student{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin:10px 0;
+  padding:12px;
+  border-radius:14px;
+  background:#fafafa;
+}
+.name{font-weight:bold}
+.score{font-size:22px;font-weight:bold}
+button{
+  border:none;
+  border-radius:10px;
+  padding:10px 14px;
+  font-size:16px;
+  cursor:pointer;
+}
+.plus{background:#dff7e8}
+.minus{background:#ffe1e1}
+.rank{
+  font-size:14px;
+  color:#666;
+}
+</style>
+</head>
+<body>
+
+<h1>🌟 ClassRank 🌟</h1>
+
+<div class="top">
+  <button onclick="resetDay()">เริ่มวันใหม่ 10 คะแนน</button>
+</div>
+
+<div class="card">
+  <h2>🏆 Ranking วันนี้</h2>
+  <div id="ranking"></div>
+</div>
+
+<div class="card">
+  <h2>นักเรียน 14 คน</h2>
+  <div id="students"></div>
+</div>
+
+<script>
+const defaultNames = [
+  "นักเรียน 1","นักเรียน 2","นักเรียน 3","นักเรียน 4",
+  "นักเรียน 5","นักเรียน 6","นักเรียน 7","นักเรียน 8",
+  "นักเรียน 9","นักเรียน 10","นักเรียน 11","นักเรียน 12",
+  "นักเรียน 13","นักเรียน 14"
+];
+
+let data = JSON.parse(localStorage.getItem("classrank")) || 
+defaultNames.map((name,i)=>({
+  id:i+1,
+  name:name,
+  score:10
+}));
+
+function save(){
+  localStorage.setItem("classrank",JSON.stringify(data));
+}
+
+function changeScore(id,amount){
+  const student=data.find(s=>s.id===id);
+  student.score+=amount;
+  save();
+  render();
+}
+
+function resetDay(){
+  if(confirm("เริ่มวันใหม่และรีเซ็ตทุกคนเป็น 10 คะแนนใช่ไหม?")){
+    data.forEach(s=>s.score=10);
+    save();
+    render();
+  }
+}
+
+function render(){
+  const students=document.getElementById("students");
+  students.innerHTML="";
+
+  data.forEach(s=>{
+    const div=document.createElement("div");
+    div.className="student";
+    div.innerHTML=`
+      <div>
+        <div class="name">${s.name}</div>
+        <div class="rank">คะแนนวันนี้</div>
+      </div>
+      <div class="score">${s.score} ⭐</div>
+      <div>
+        <button class="plus" onclick="changeScore(${s.id},1)">+1</button>
+        <button class="minus" onclick="changeScore(${s.id},-1)">-1</button>
+      </div>
+    `;
+    students.appendChild(div);
+  });
+
+  const sorted=[...data].sort((a,b)=>b.score-a.score);
+  const ranking=document.getElementById("ranking");
+  ranking.innerHTML="";
+
+  sorted.forEach((s,index)=>{
+    const row=document.createElement("div");
+    row.className="student";
+    row.innerHTML=`
+      <div class="name">#${index+1} ${s.name}</div>
+      <div class="score">${s.score} ⭐</div>
+    `;
+    ranking.appendChild(row);
+  });
+}
+
+render();
+</script>
+
+</body>
+</html>
